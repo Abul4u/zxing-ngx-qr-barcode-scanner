@@ -1,0 +1,2 @@
+<button (click)='onCamera()'>On Camera</button>
+<zxing-scanner *ngIf='flagCameraOn' (scanSuccess)="handleQrCodeResult($event)" [formats]="allowedFormats" width='300' height='300' style="border: 1px solid #000;"></zxing-scanner>
