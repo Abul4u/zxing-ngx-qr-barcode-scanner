@@ -1,4 +1,4 @@
-import { Component, VERSION, OnInit, ViewChild } from '@angular/core';
+import { Component, VERSION, OnInit, ViewChild, EventEmitter, Output } from '@angular/core';
 
 import { ZXingScannerComponent } from '@zxing/ngx-scanner';
 
@@ -13,7 +13,7 @@ export class ZxingQrBarcodeScannerComponent implements OnInit {
 
   flagCameraOn: boolean = true;
 
-  device_id;
+  deviceSelected;
   allowedFormats = [
     BarcodeFormat.AZTEC,
 
@@ -65,11 +65,13 @@ export class ZxingQrBarcodeScannerComponent implements OnInit {
     /** UPC/EAN extension format. Not a stand-alone format. */
     BarcodeFormat.UPC_EAN_EXTENSION
   ];
-  
+
   ngVersion = VERSION.full;
 
   @ViewChild('scanner')
   scanner: ZXingScannerComponent;
+
+  @Output() scannerValue = new EventEmitter();
 
   hasDevices: boolean;
   hasPermission: boolean;
@@ -77,7 +79,7 @@ export class ZxingQrBarcodeScannerComponent implements OnInit {
   qrResult: Result;
 
   availableDevices: MediaDeviceInfo[];
-  currentDevice: MediaDeviceInfo;
+  currentDevice: MediaDeviceInfo = undefined;
 
   ngOnInit(): void {
 
@@ -87,13 +89,12 @@ export class ZxingQrBarcodeScannerComponent implements OnInit {
 
       // // selects the devices's back camera by default
       for (const device of devices) {
-          console.log('device: ', device.kind);
-          if (/back|rear|environment/gi.test(device.label)) {
-              this.scanner.changeDevice(device);
-              this.currentDevice = device;
-              this.device_id = device.deviceId;
-              break;
-          }
+        this.deviceSelected = device;
+        if (/back|rear|environment/gi.test(device.label)) {
+          this.deviceSelected = device;
+          break;
+        }
+
       }
     });
 
@@ -102,20 +103,16 @@ export class ZxingQrBarcodeScannerComponent implements OnInit {
     this.scanner.permissionResponse.subscribe((perm: boolean) => this.hasPermission = perm);
   }
 
-  // displayCameras(cameras: MediaDeviceInfo[]) {
-  //   console.debug('Devices: ', cameras);
-  //   this.availableDevices = cameras;
-  // }
-
   handleQrCodeResult(resultString: string) {
     console.debug('Result: ', resultString);
     this.qrResultString = resultString;
+    this.scannerValue.emit(this.qrResultString);
   }
 
-  onDeviceSelectChange(selectedValue?: string) {
-    console.debug('Selection changed: ', selectedValue);
-    this.currentDevice = this.scanner.getDeviceById(selectedValue);
-  }
+  // onDeviceSelectChange(selectedValue?: string) {
+  //   console.debug('Selection changed: ', selectedValue);
+  //   this.currentDevice = this.scanner.getDeviceById(selectedValue);
+  // }
 
   stateToEmoji(state: boolean): string {
 
@@ -133,9 +130,15 @@ export class ZxingQrBarcodeScannerComponent implements OnInit {
     return states['' + state];
   }
 
-onCamera(){
-  this.flagCameraOn = !this.flagCameraOn;
-  this.onDeviceSelectChange(this.device_id);
-}
+  onCamera(deviceId) {
+    this.flagCameraOn = !this.flagCameraOn;
+    if (!this.flagCameraOn) {
+      this.scanner.changeDevice(this.deviceSelected);
+      return true;
+    } 
+    this.scanner.changeDevice(undefined);
+  }
+
+
 
 }

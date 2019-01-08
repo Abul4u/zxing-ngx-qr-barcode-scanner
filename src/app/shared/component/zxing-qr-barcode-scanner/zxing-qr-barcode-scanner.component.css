@@ -1,0 +1,16 @@
+zxing-scanner{
+    width: 100%;
+    height: 50vh;
+    border: 1px solid #000;
+    overflow: hidden;
+}
+
+.reduceHeight{
+    height: 0px;
+    overflow: hidden;
+}
+
+zxing-scanner video{
+    width: 100%;
+    height: 100%;
+}

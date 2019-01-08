@@ -1,3 +1,4 @@
 <!-- <app-camera-back></app-camera-back> -->
 
-<app-zxing-qr-barcode-scanner></app-zxing-qr-barcode-scanner>
+<app-zxing-qr-barcode-scanner (scannerValue)='onScannerValue($event)'></app-zxing-qr-barcode-scanner>
+<h5>{{ result }}</h5>

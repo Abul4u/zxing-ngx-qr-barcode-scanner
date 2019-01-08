@@ -6,5 +6,11 @@ import { Component } from '@angular/core';
   styleUrls: [ './app.component.css' ]
 })
 export class AppComponent  {
-  name = 'Angular';
+  result: string;
+
+  onScannerValue(eventValue){
+    this.result = eventValue;
+    alert('Checking:' + eventValue);
+  }
+
 }
